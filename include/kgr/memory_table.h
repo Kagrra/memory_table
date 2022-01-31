@@ -8,8 +8,13 @@
 
 namespace kgr
 {
-template<typename AddressType, typename... Ts> struct memory_table
+template<typename AddressType, typename... Ts> class memory_table
 {
+public:
+    constexpr static std::size_t table_width = address_width + (width_of<Ts>::value + ...) + sizeof...(Ts) + 2;
+    constexpr static std::string_view header {header_as_array.data(), header_as_array.size()};
+
+private:
     constexpr static std::size_t margin_width = 2;
     constexpr static std::size_t bytes = std::max({sizeof(Ts)...});
     constexpr static std::size_t address_width = 2 /* 0x */ + sizeof(AddressType) * 2 + margin_size;
@@ -54,8 +59,6 @@ template<typename AddressType, typename... Ts> struct memory_table
 
     template<typename T> constexpr static std::size_t width_of_v = width_of<T>::value;
 
-    constexpr static std::size_t line_width = address_width + (width_of<Ts>::value + ...) + sizeof...(Ts) + 2;
-
     // returns array with label in center
     template<int I> static constexpr std::array<char, I> in_center(const char* label)
     {
@@ -85,7 +88,7 @@ template<typename AddressType, typename... Ts> struct memory_table
         // here we want numbered bits
         if constexpr (std::is_same_v<T, bool>)
         {
-            // becouse constexpr
+            // because constexpr
             std::array<std::array<char, 2>, 8> bool_label
                 = {{{' ', '0'}, {'7', ' '}, {' ', '8'}, {'1', '5'}, {'1', '6'}, {'2', '3'}, {'2', '4'}, {'3', '1'}}};
             std::array<char, width_of_v<bool>> arr;
@@ -155,10 +158,10 @@ template<typename AddressType, typename... Ts> struct memory_table
         }
     };
 
-    constexpr static std::array<char, line_width> header_as_array = []() constexpr
+    constexpr static std::array<char, table_width> header_as_array = []() constexpr
     {
         std::array<char, 1> divider {'|'};
-        std::array<char, line_width> arr;
+        std::array<char, table_width> arr;
 
         auto ptr = arr.begin();
 
@@ -173,8 +176,6 @@ template<typename AddressType, typename... Ts> struct memory_table
         return arr;
     }
     ();
-
-    constexpr static std::string_view header {header_as_array.data(), header_as_array.size()};
 };
 
 } // namespace kgr
