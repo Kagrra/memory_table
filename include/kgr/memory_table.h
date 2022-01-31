@@ -4,6 +4,7 @@
 #include <array>
 #include <bitset>
 #include <cstdint>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <string_view>
@@ -31,7 +32,7 @@ private:
             if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
             {
                 static_assert(sizeof(T) == bytes);
-                return margin_width + 8;
+                return margin_width + 12;
             }
             if constexpr (std::is_same_v<T, bool>)
                 return margin_width + bytes * 8 + bytes - 1;
@@ -177,13 +178,13 @@ private:
     }
     ();
 
-    template<typename T> auto print(const std::array<uint8_t, bytes>& data) -> void
+    template<typename T> static auto print(const std::array<uint8_t, bytes>& data) -> void
     {
         if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
         {
             T temp;
             memcpy(&temp, data.data(), sizeof(T));
-            std::cout << std::setw(8) << temp << "|";
+            std::cout << ' ' << std::setw(width_of_v<T> - 2) << temp << " |";
         }
 
         if constexpr (std::is_same_v<T, bool>)
@@ -224,6 +225,22 @@ private:
 public:
     constexpr static std::string_view header {header_as_array_.data(), header_as_array_.size()};
     constexpr static std::size_t line_width {table_width_};
+
+    static void print_data(AddressType address, std::array<uint8_t, bytes> data)
+    {
+        std::cout << "| 0x" << std::setw(sizeof(AddressType) * 2) << std::setfill('0') << std::hex << (int)address
+                  << " |";
+        (print<Ts>(data), ...);
+        std::cout << '\n';
+    }
+
+    template<typename T> static void print_data(AddressType address, T data)
+    {
+        static_assert(sizeof(T) == bytes);
+        std::array<uint8_t, bytes> temp {};
+        memcpy(temp.data(), &data, bytes);
+        print_data(address, temp);
+    }
 };
 
 } // namespace kgr
