@@ -1,0 +1,25 @@
+---
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: 'true'
+AlignConsecutiveAssignments: 'false'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: 'true'
+BreakBeforeBraces: Allman
+ColumnLimit: '120'
+Cpp11BracedListStyle: 'true'
+IndentCaseLabels: 'true'
+IndentWidth: '4'
+NamespaceIndentation: Inner
+PointerAlignment: Left
+ReflowComments: 'true'
+SortIncludes: 'true'
+Standard: Cpp11
+UseTab: Never
+FixNamespaceComments: 'true'
+SpaceAfterTemplateKeyword: 'false'
+SpaceBeforeParens: ControlStatements
+IndentPPDirectives: AfterHash
