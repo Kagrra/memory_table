@@ -18,3 +18,7 @@ Expected result
 | 0x74 | 00011000 00110000 | 006192 | 18 30 |
 ```
 
+# Example
+```sh
+g++ main.cpp -std=c++20 -O3
+```
