@@ -1,7 +1,9 @@
 #ifndef KGR_MEMORY_TABLE_H
 #define KGR_MEMORY_TABLE_H
 
+#include <array>
 #include <cstdint>
+#include <string_view>
 #include <type_traits>
 
 namespace kgr
@@ -72,11 +74,12 @@ template<typename AddressType, typename... Ts> struct memory_table
         return arr;
     }
 
+    // returns label as array for selected type
     template<typename T> static constexpr auto label()
     {
         if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
         {
-            return in_center<width_of_v<float>>("float");
+            return in_center<width_of_v<T>>("float");
         }
 
         // here we want numbered bits
@@ -151,6 +154,27 @@ template<typename AddressType, typename... Ts> struct memory_table
             return in_center<width_of_v<T>>("dec");
         }
     };
+
+    constexpr static std::array<char, line_width> header_as_array = []() constexpr
+    {
+        std::array<char, 1> divider {'|'};
+        std::array<char, line_width> arr;
+
+        auto ptr = arr.begin();
+
+        auto concat = [&](auto txt) {
+            ptr = std::copy(divider.begin(), divider.end(), ptr);
+            ptr = std::copy(txt.begin(), txt.end(), ptr);
+        };
+
+        concat(in_center<address_size>("addr"));
+        (concat(label<Ts>()), ...);
+        ptr = std::copy(divider.begin(), divider.end(), ptr);
+        return arr;
+    }
+    ();
+
+    constexpr static std::string_view header {header_as_array.data(), header_as_array.size()};
 };
 
 } // namespace kgr
